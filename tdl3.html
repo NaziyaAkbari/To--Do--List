@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Animated Todo</title>
+
+<style>
+
+/* ========== GLOBAL ========== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI', sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    transition:0.4s;
+}
+
+/* ========== ANIMATED BACKGROUND ========== */
+body::before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-size:cover;
+    background-position:center;
+    animation:bgSlide 20s infinite;
+    z-index:-2;
+}
+
+@keyframes bgSlide{
+    0%{background-image:url("https://images.unsplash.com/photo-1503264116251-35a269479413");}
+    33%{background-image:url("https://images.unsplash.com/photo-1492724441997-5dc865305da7");}
+    66%{background-image:url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee");}
+    100%{background-image:url("https://images.unsplash.com/photo-1503264116251-35a269479413");}
+}
+
+body::after{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.5);
+    z-index:-1;
+}
+
+/* ========== FLOATING PARTICLES ========== */
+.particle{
+    position:absolute;
+    width:6px;
+    height:6px;
+    background:white;
+    border-radius:50%;
+    opacity:0.5;
+    animation:float 10s infinite linear;
+}
+
+@keyframes float{
+    from{transform:translateY(100vh);}
+    to{transform:translateY(-10vh);}
+}
+
+/* ========== CONTAINER ========== */
+.container{
+    width:420px;
+    padding:25px;
+    border-radius:20px;
+    backdrop-filter:blur(15px);
+    background:rgba(255,255,255,0.15);
+    box-shadow:0 15px 40px rgba(0,0,0,0.4);
+    animation:fadeIn 0.8s ease;
+    color:white;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(20px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+h1{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.clock{
+    text-align:center;
+    margin-bottom:15px;
+    font-size:14px;
+    opacity:0.8;
+}
+
+/* INPUT */
+.input-section{
+    display:flex;
+    gap:8px;
+}
+
+input{
+    flex:1;
+    padding:10px;
+    border-radius:10px;
+    border:none;
+    outline:none;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#00d4ff;
+    color:black;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.1);
+}
+
+/* PROGRESS */
+.progress-container{
+    height:8px;
+    background:rgba(255,255,255,0.3);
+    border-radius:10px;
+    margin:15px 0;
+}
+
+.progress-bar{
+    height:8px;
+    width:0%;
+    background:#00ffcc;
+    border-radius:10px;
+    transition:0.4s;
+}
+
+/* TASK LIST */
+ul{
+    list-style:none;
+    max-height:200px;
+    overflow-y:auto;
+}
+
+li{
+    background:rgba(255,255,255,0.9);
+    color:black;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    animation:slideIn 0.4s ease;
+    transition:0.3s;
+}
+
+@keyframes slideIn{
+    from{opacity:0; transform:translateX(-20px);}
+    to{opacity:1; transform:translateX(0);}
+}
+
+li:hover{
+    transform:scale(1.03);
+}
+
+.completed{
+    background:#d4edda;
+    text-decoration:line-through;
+    color:gray;
+}
+
+.delete-btn{
+    background:red;
+    color:white;
+}
+
+/* DARK MODE */
+.dark .container{
+    background:rgba(0,0,0,0.6);
+}
+
+.toggle{
+    margin-top:10px;
+    width:100%;
+    background:#ffcc00;
+}
+
+.counter{
+    font-size:12px;
+    text-align:right;
+    margin-top:5px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>✨Todo-List</h1>
+<div class="clock" id="clock"></div>
+
+<div class="input-section">
+<input type="text" id="taskInput" placeholder="Enter task...">
+<button onclick="addTask()">Add</button>
+</div>
+
+<div class="progress-container">
+<div class="progress-bar" id="progressBar"></div>
+</div>
+
+<ul id="taskList"></ul>
+
+<div class="counter" id="counter"></div>
+
+<button class="toggle" onclick="toggleDark()">🌙 Toggle Dark Mode</button>
+</div>
+
+<script>
+
+/* LIVE CLOCK */
+setInterval(()=>{
+document.getElementById("clock").innerText=new Date().toLocaleString();
+},1000);
+
+/* PARTICLES */
+for(let i=0;i<25;i++){
+let p=document.createElement("div");
+p.className="particle";
+p.style.left=Math.random()*100+"vw";
+p.style.animationDuration=(5+Math.random()*5)+"s";
+document.body.appendChild(p);
+}
+
+/* ADD TASK */
+function addTask(){
+const input=document.getElementById("taskInput");
+if(input.value.trim()==="") return;
+
+const li=document.createElement("li");
+li.innerHTML=`
+<span>${input.value}</span>
+<button class="delete-btn">X</button>
+`;
+
+li.querySelector("span").onclick=()=>{
+li.classList.toggle("completed");
+updateProgress();
+saveData();
+};
+
+li.querySelector(".delete-btn").onclick=()=>{
+li.remove();
+updateProgress();
+saveData();
+};
+
+document.getElementById("taskList").appendChild(li);
+input.value="";
+updateProgress();
+saveData();
+}
+
+/* PROGRESS */
+function updateProgress(){
+const tasks=document.querySelectorAll("#taskList li");
+const completed=document.querySelectorAll("#taskList li.completed");
+const percent=tasks.length===0?0:(completed.length/tasks.length)*100;
+document.getElementById("progressBar").style.width=percent+"%";
+document.getElementById("counter").innerText=
+`Completed ${completed.length} of ${tasks.length} tasks`;
+}
+
+/* DARK MODE */
+function toggleDark(){
+document.body.classList.toggle("dark");
+}
+
+/* LOCAL STORAGE */
+function saveData(){
+localStorage.setItem("tasks",document.getElementById("taskList").innerHTML);
+}
+
+function loadData(){
+document.getElementById("taskList").innerHTML=
+localStorage.getItem("tasks")||"";
+}
+
+loadData();
+updateProgress();
+
+</script>
+
+</body>
+</html>
