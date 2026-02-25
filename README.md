@@ -9,5 +9,6 @@ An ultra-modern, fully interactive To-Do List web application built entirely in 
 * Task statistics (Total / Completed / Missed)
 * Data persistence using localStorage
 * Responsive and interactive design
+  
 #Author
 NAZIYA AKBARI
